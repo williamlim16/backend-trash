@@ -12,4 +12,6 @@ func Setup(app *fiber.App) {
 	app.Use(middleware.IsAuthenticate)
 	app.Get("/api/trashcans", controller.GetTrashCan)
 	app.Post("/api/trashcan", controller.CreateTrashCan)
+	app.Put("/api/trashcan/:id", controller.UpdateTrashCan)
+	app.Delete("/api/trashcan/:id", controller.DeleteTrashCan)
 }

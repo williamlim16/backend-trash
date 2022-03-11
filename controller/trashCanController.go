@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/williamlim16/backend-trash/database"
@@ -33,5 +34,35 @@ func GetTrashCan(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"data": getTrashCan,
+	})
+}
+
+func UpdateTrashCan(c *fiber.Ctx) error {
+	trashCanID, _ := strconv.Atoi(c.Params("id"))
+	trashCan := models.TrashCan{
+		ID: uint(trashCanID),
+	}
+
+	if err := c.BodyParser(&trashCan); err != nil {
+		fmt.Println("Unable to parse body")
+	}
+
+	database.DB.Model(&trashCan).Updates(trashCan)
+	return c.JSON(fiber.Map{
+		"message": "Trash updated successfuly",
+	})
+}
+
+func DeleteTrashCan(c *fiber.Ctx) error {
+	trashCanID, _ := strconv.Atoi(c.Params("id"))
+	trashCan := models.TrashCan{
+		ID: uint(trashCanID),
+	}
+	if err := c.BodyParser(&trashCan); err != nil {
+		fmt.Println("Unable to parse body")
+	}
+	database.DB.Delete(&trashCan)
+	return c.JSON(fiber.Map{
+		"message": "Trash can " + strconv.Itoa(trashCanID) + " successfuly deleted.",
 	})
 }
