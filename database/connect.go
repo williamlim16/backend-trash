@@ -29,6 +29,7 @@ func Connect() {
 	db.AutoMigrate(
 		&models.User{},
 		&models.TrashCan{},
+		&models.Trash{},
 	)
 	DB = db
 }
