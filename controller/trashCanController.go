@@ -19,7 +19,7 @@ func CreateTrashCan(c *fiber.Ctx) error {
 	if err := database.DB.Create(&trashCan).Error; err != nil {
 		c.Status(400)
 		return c.JSON(fiber.Map{
-			"message": "Invalid password",
+			"message": "Invalid payload",
 		})
 	}
 
@@ -30,7 +30,7 @@ func CreateTrashCan(c *fiber.Ctx) error {
 
 func GetTrashCan(c *fiber.Ctx) error {
 	var getTrashCan []models.TrashCan
-	database.DB.Find(&getTrashCan)
+	database.DB.Preload("User").Find(&getTrashCan)
 
 	return c.JSON(fiber.Map{
 		"data": getTrashCan,
@@ -49,7 +49,7 @@ func UpdateTrashCan(c *fiber.Ctx) error {
 
 	database.DB.Model(&trashCan).Updates(trashCan)
 	return c.JSON(fiber.Map{
-		"message": "Trash updated successfuly",
+		"message": "Trash can updated successfuly",
 	})
 }
 

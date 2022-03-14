@@ -14,4 +14,8 @@ func Setup(app *fiber.App) {
 	app.Post("/api/trashcan", controller.CreateTrashCan)
 	app.Put("/api/trashcan/:id", controller.UpdateTrashCan)
 	app.Delete("/api/trashcan/:id", controller.DeleteTrashCan)
+	app.Get("/api/trash", controller.GetTrash)
+	app.Post("/api/trash", controller.CreateTrash)
+	app.Put("/api/trash/:id", controller.UpdateTrash)
+	app.Delete("/api/trash/:id", controller.DeleteTrash)
 }
