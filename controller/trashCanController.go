@@ -37,6 +37,19 @@ func GetTrashCan(c *fiber.Ctx) error {
 	})
 }
 
+func EditTrashCan(c *fiber.Ctx) error {
+	trashCanID, _ := strconv.Atoi(c.Params("id"))
+	var trashCan models.TrashCan
+	// if err := c.BodyParser(&trashCan); err != nil {
+	// 	fmt.Println("Unable to parse body")
+	// }
+
+	database.DB.First(&trashCan, trashCanID)
+	return c.JSON(fiber.Map{
+		"data": trashCan,
+	})
+}
+
 func UpdateTrashCan(c *fiber.Ctx) error {
 	trashCanID, _ := strconv.Atoi(c.Params("id"))
 	trashCan := models.TrashCan{
