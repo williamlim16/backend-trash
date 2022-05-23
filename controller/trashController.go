@@ -25,18 +25,20 @@ func CreateTrash(c *fiber.Ctx) error {
 
 	if errFile != nil {
 		fmt.Println("Unable to parse image")
+		fmt.Println(errFile)
 	}
 
 	now := time.Now()
 
 	filename := strconv.Itoa(now.Day()) + file.Filename
-	filepath := "/public/images/" + filename
+	filepath := "/images/" + filename
 	trash.Image = filepath
 
 	errSaveFile := c.SaveFile(file, fmt.Sprintf("./public/images/%s", filename))
 
 	if errSaveFile != nil {
 		log.Println("Save error")
+		log.Println(errSaveFile)
 	}
 
 	if err := database.DB.Create(&trash).Error; err != nil {
