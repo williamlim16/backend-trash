@@ -2,7 +2,11 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"strconv"
+	"time"
+
+	// "time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/williamlim16/backend-trash/database"
@@ -14,6 +18,27 @@ func CreateTrash(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(&trash); err != nil {
 		fmt.Println("Unable to parse body")
+		fmt.Println(err)
+	}
+
+	file, errFile := c.FormFile("image")
+
+	if errFile != nil {
+		fmt.Println("Unable to parse image")
+		fmt.Println(errFile)
+	}
+
+	now := time.Now()
+
+	filename := strconv.Itoa(now.Day()) + file.Filename
+	filepath := "/images/" + filename
+	trash.Image = filepath
+
+	errSaveFile := c.SaveFile(file, fmt.Sprintf("./public/images/%s", filename))
+
+	if errSaveFile != nil {
+		log.Println("Save error")
+		log.Println(errSaveFile)
 	}
 
 	if err := database.DB.Create(&trash).Error; err != nil {
@@ -30,7 +55,7 @@ func CreateTrash(c *fiber.Ctx) error {
 
 func GetTrash(c *fiber.Ctx) error {
 	var getTrash []models.Trash
-	database.DB.Preload("User").Preload("TrashCan").Find(&getTrash)
+	database.DB.Preload("TrashCan").Find(&getTrash)
 
 	return c.JSON(fiber.Map{
 		"data": getTrash,

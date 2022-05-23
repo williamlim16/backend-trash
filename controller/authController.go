@@ -21,30 +21,27 @@ func validateEmail(email string) bool {
 }
 
 func Register(c *fiber.Ctx) error {
-	var data map[string]interface{}
+	tempBody := struct {
+		FirstName string
+		LastName  string
+		Email     string
+		Password  string
+		Phone     string
+	}{}
 	var userData models.User
-	if err := c.BodyParser(&data); err != nil {
-		fmt.Println("Unable to parse body")
-	}
 
-	//Check if password less than six
-	if len(data["password"].(string)) <= 6 {
+	if err := c.BodyParser(&tempBody); err != nil {
+		log.Println(err)
+		return err
+	}
+	if len(tempBody.Password) <= 6 {
 		c.Status(400)
 		return c.JSON(fiber.Map{
 			"message": "Password must be greater than 6 character",
 		})
 	}
 
-	//Validates the email
-	// if !validateEmail(strings.TrimSpace(data["email"].(string))) {
-	// 	c.Status(400)
-	// 	return c.JSON(fiber.Map{
-	// 		"message": "Invalid email",
-	// 	})
-	// }
-
-	//Check if email exist
-	database.DB.Where("email=?", strings.TrimSpace(data["email"].(string))).First(&userData)
+	database.DB.Where("email=?", strings.TrimSpace(tempBody.Email)).First(&userData)
 
 	if userData.ID != 0 {
 		c.Status(400)
@@ -52,14 +49,15 @@ func Register(c *fiber.Ctx) error {
 			"message": "Email already exist",
 		})
 	}
+
 	user := models.User{
-		FirstName: data["first_name"].(string),
-		LastName:  data["last_name"].(string),
-		Phone:     data["phone"].(string),
-		Email:     strings.TrimSpace(data["email"].(string)),
+		FirstName: tempBody.FirstName,
+		LastName:  tempBody.LastName,
+		Phone:     tempBody.Phone,
+		Email:     tempBody.Email,
 	}
 
-	user.SetPassword(data["password"].(string))
+	user.SetPassword(tempBody.Password)
 	err := database.DB.Create(&user)
 	if err != nil {
 		log.Println(err)
@@ -72,14 +70,18 @@ func Register(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-	var data map[string]string
 
-	if err := c.BodyParser(&data); err != nil {
+	tempBody := struct {
+		Email    string
+		Password string
+	}{}
+
+	if err := c.BodyParser(&tempBody); err != nil {
 		fmt.Println("Unable to parse body")
 	}
 
 	var user models.User
-	database.DB.Where("email=?", data["email"]).First(&user)
+	database.DB.Where("email=?", tempBody.Email).First(&user)
 
 	if user.ID == 0 {
 		c.Status(404)
@@ -88,7 +90,7 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := user.ComparePassword(data["password"]); err != nil {
+	if err := user.ComparePassword(tempBody.Password); err != nil {
 		c.Status(404)
 		return c.JSON(fiber.Map{
 			"message": "Wrong password",
