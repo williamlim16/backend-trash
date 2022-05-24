@@ -7,7 +7,8 @@ import (
 )
 
 func Setup(app *fiber.App) {
-	app.Static("/", "./public")
+	app.Static("/", "./public/build")
+	app.Static("/images", "./public/images")
 	app.Post("/api/login", controller.Login)
 	app.Post("/api/register", controller.Register)
 	app.Use(middleware.IsAuthenticate)
